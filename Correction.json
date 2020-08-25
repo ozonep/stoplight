@@ -1,0 +1,1637 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Correction Service",
+    "version": "0.1.0",
+    "description": "Students need feedback after answering an exercise. \nThe process of describing how a correct answer looks like, evaluating if an \nanswer is correct, and providing the appropriate feedback in return, is \nwhat the Correction Service facilitates.\n\n# Introduction\n\nThis API is organized around [REST](https://en.wikipedia.org/wiki/Representational_state_transfer).\nIt has predictable, mostly entity-oriented (though, also some functionally oriented) URLs, accepts \neither [application/json](https://tools.ietf.org/html/rfc4627)\nor [multipart/form-data (supporting file uploads)](https://tools.ietf.org/html/rfc7578) request bodies, \nreturns JSON-encoded responses, and uses standard HTTP response codes, \nauthentication, and verbs.\n\n# Mental Model\n\nThe correction service turns answers into inspiring and useful feedback. In order \nto do so, and do it well, we need a couple of additional structures.\n\n### Correction Blueprints\na high-level description of what distinguish correct answers from incorrect ones.\n\n### Correction Implementation\na low-level, coded implementation of automatic correction. \n\n### Correction Approach\na chosen approach to manual correction. E.g. `requirement-by-requirement`, \n`overview, then requirement-by-requirement`\n\n### Correction Records\nanalytics collected during the performance of a given correction approach.\n\n### Feedback\na structure provided to the user based on various correction data points and logic.\n\nCorrection involves both a higher-level description of what a correct answer \nlooks like, and a lower-level evaluation of how well a given answer corresponds \nto the higher-level description.\n\nWe define this higher level description in the `Correction Blueprint` object. It \nis encoded as a set of requirements.\n\nThe lower-level evaluation can be performed by people or algorithms. Any lower-level \nevaluation performed by algorithms is considered automatic correction. Any \nlower-level evaluation performed by people is considered manual correction. \n\nIn summary, correction approaches can be broken down like this:\n\n<p align=\"center\">\n  <img alt=\"exercise types\" src=\"/spec-assets/correction-approaches.svg\" />\n</p>\n\n1. **Automatic** - performed by algorithms.\n  1. **Rule-based Algorithms** - using standard, automatic testing technology from the IT industry.\n  2. **Machine Learning Algorithms** - using machine learning classification algorithms.  \n2. **Manual** - performed by people.\n  1. **Peer** - a person with equal or greater competency within the field.\n  1. **Expert** - a person verified to have very high competency within the field.\n\n## Automatic Correction\n\n### Rule-Based Algorithms\n\nRule-based correction algorithms utilizes standardized automatic testing technology from the\nIT industry. This technology uses test cases. We have defined a set of these test case types \nlisted below.\n\n<p align=\"center\">\n  <img alt=\"exercise types\" src=\"/spec-assets/test-case-types.svg\" />\n</p>\n\nBased on the amount of test cases that passes, and fails, in addition to assigning a weight \nto each test case, we can deterimine a percentage of correctness for a given answer.\n\n### Machine Learning Algorithms\n\nMachine Learning correction algorithms utilizes machine learning techniques, more specifically, \nmostly deep neural networks, to perform corrections. Machine learning methods need data, either \ndirectly from the exercise and its associated solution space, or from similar exercises and \nsolution spaces.\n\nMachine learning algorithms will likely be used more in the future. In addition to correcting \nfor specific requirements within a single exercise, it is possible that machine learning \nalgorithms can be generalized to work with requirements across exercises and/or to correct \nanswers without the need for a set of requirements to be specificed. It is also worth noting \nthat machine learning algorithms, at least currently, could perform badly in face of novel \nsolutions that isn't properly accounted for in the available data sets its been trained on.\n\n## Manual Correction\n\n### Peer \n\nPeer corrections are performed manually by a person with equal or greater competency than the \nuser providing the answer, within the field. Our system needs a mechanism of classifying a \npeer in order to properly support this correction approach. In the beginning this can be done \nmanually, and over time, we should be able to solve this classification problem in an automatic, \nscalable manner.\n\n### Expert\n\nExpert corrections are performed manually by a person verified to have very high competency within \nthe field. Our system needs a mechanism of verifying an expert in order to properly support this \ncorrection approach. In the beginning this can be done manually, and over time, we should be \nable to solve this classification problem in an automatic, scalable manner.\n\n# Authentication\n\nThis API uses auth0 to authenticate and authorize users. \n\nFor public client applications, this API supports OAuth2, and more specifically, \nthe authorization code flow. More details regarding auth0 and this flow specifically \ncan be found [here](https://auth0.com/docs/flows/guides/auth-code/add-login-auth-code).\n\n\n<!-- ReDoc-Inject: <security-definitions> -->\n"
+  },
+  "servers": [
+    {
+      "url": "https://europe-west1-firestoreanswer.cloudfunctions.net/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Correction Blueprints",
+      "description": "The ```Correction Blueprint``` object contains a higher level description\nof how a correct answer should look like. Think of it like an interface definition.\nThe Correction Blueprint is the interface, allowing both for manual and\nautoamtic correction to be performed. The specific implementations of either manual or\nautomatic corrections are done in other services."
+    },
+    {
+      "name": "Correction Implementations",
+      "description": "An executable implementation of correction based on an available correction \nblueprint. If the blueprint is the interface, this is the implementation. This \nseparation allows a single blueprint to receive multiple proposed implementations, \nopening up for crowdsourcing. The bluprint holds higher-level, abstract definitions, \nand this holds the complementary low-level practical implementation."
+    },
+    {
+      "name": "Correction",
+      "description": "This section is about performing corrections. The input is an answer object, the output\nis a set of feedback objects to the student."
+    },
+    {
+      "name": "Correction Records",
+      "description": "We need a way to keep track of corrections that have been made.\nand the ability to verify if a correction is indeed right or\nwrong. This is the purpose of the Correction `Correction Record` object."
+    },
+    {
+      "name": "Client Correction Bundles",
+      "description": "This bundle enables automatic correction of exercises offline, as well as \ncorrections that will execute in under 16 milliseconds.\n\nThe bundle can be exercuted on the client side, and only requires the hashing\nof the answer input to work. The hashing algorithm of choice is\n[MD4](https://tools.ietf.org/html/rfc1320) due to its performance when working\nwith strings. Open for suggestions, if you know a hashing algorithm more suited \nfor the task (hashing strings with variable size relatively fast and slightly secure).\n\nIn the future, this may also consist of a prediction of the student's \nsolution path, as well as a set of personalized feedback objects for each \npredicted step towards the solution for the specific exercise."
+    }
+  ],
+  "paths": {
+    "/correction_blueprints": {
+      "post": {
+        "summary": "Create a Correction Blueprint",
+        "operationId": "createCorrectionBlueprint",
+        "description": "Create a Correction Blueprint.",
+        "security": [
+          {
+            "OAuth2": [
+              "write:correction_blueprints"
+            ]
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectionBlueprintDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful creation of a Correction Blueprint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionBlueprintDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          }
+        },
+        "tags": [
+          "Correction Blueprints"
+        ]
+      },
+      "get": {
+        "summary": "List Correction Blueprints",
+        "operationId": "listCorrectionBlueprints",
+        "description": "Retrieves a list of Correction Blueprints in form of an array.\nIf no query parameters are provided, it will return all Correction \nBlueprints the user has access to.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionBlueprintListDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/404_not_found"
+          }
+        },
+        "tags": [
+          "Correction Blueprints"
+        ]
+      }
+    },
+    "/correction_blueprints/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "description": "A unique identifier for the correction blueprint resource.",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Retrieve a Correction Blueprint",
+        "operationId": "retrieveCorrectionBlueprint",
+        "description": "Retrieves the details of an existing `Correction Blueprint`. Simply supply a unique correction blueprint ID, and you'll get the corresponding correction blueprint information in return.",
+        "security": [
+          {
+            "OAuth2": [
+              "read:correction_blueprints"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionBlueprintDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/404_not_found"
+          }
+        },
+        "tags": [
+          "Correction Blueprints"
+        ]
+      },
+      "put": {
+        "summary": "Update an CorrectionBlueprint",
+        "operationId": "updateCorrectionBlueprint",
+        "description": "Update an CorrectionBlueprint",
+        "security": [
+          {
+            "OAuth2": [
+              "write:correction_blueprints"
+            ]
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectionBlueprintDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionBlueprintDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          }
+        },
+        "tags": [
+          "Correction Blueprints"
+        ]
+      }
+    },
+    "/automatic_correction_implementation": {
+      "post": {
+        "summary": "Create a Automatic Correction Implementation",
+        "operationId": "createAutomaticCorrectionImplementation",
+        "description": "Create an Automatic Correction Implementation.",
+        "security": [
+          {
+            "OAuth2": [
+              "write:automatic_correction_implementations"
+            ]
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AutomaticCorrectionImplementationDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful creation of an Automatic Correction Implementation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomaticCorrectionImplementationDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          }
+        },
+        "tags": [
+          "Correction Implementations"
+        ]
+      },
+      "get": {
+        "summary": "List Correction Implementations",
+        "operationId": "listAutomaticCorrectionImplementatios",
+        "description": "Retrieves all Correction Implementations or a filtered list of Correction Implementations in form of an array.\nIf no query parameters are provided, it will return all Correction Implementations the user\nhas access to.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomaticCorrectionImplementationListDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/404_not_found"
+          }
+        },
+        "tags": [
+          "Correction Implementations"
+        ]
+      }
+    },
+    "/automatic_correction_implementation/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "description": "A unique identifier for the automatic correction implementation resource.",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Retrieve a Automatic Correction Implementation",
+        "operationId": "retrieveAutomaticCorrectionImplementation",
+        "description": "Retrieves the details of an existing `Automatic Correction Implementation`. Simply supply a unique automatic correction implementation ID, and you'll get the corresponding automatic correction implementation information in return.",
+        "security": [
+          {
+            "OAuth2": [
+              "read:automatic_correction_implementations"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomaticCorrectionImplementationDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/404_not_found"
+          }
+        },
+        "tags": [
+          "Correction Implementations"
+        ]
+      },
+      "put": {
+        "summary": "Update an AutomaticCorrectionImplementation",
+        "operationId": "updateAutomaticCorrectionImplementation",
+        "description": "Update an Automatic Correction Implementation",
+        "security": [
+          {
+            "OAuth2": [
+              "write:automatic_correction_implementations"
+            ]
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AutomaticCorrectionImplementationDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomaticCorrectionImplementationDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          }
+        },
+        "tags": [
+          "Correction Implementations"
+        ]
+      }
+    },
+    "/correct": {
+      "post": {
+        "summary": "Perform a Correction",
+        "operationId": "performCorrection",
+        "description": "Takes an answer as input, performs a correction, and returns a set of feedback objects. It fetches a correction blueprint based on the exrecise Id found in the answer, and performs the correction. After the correction is performed, a correction record is created where the information about the correction is stored.",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful submit of an answer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          }
+        },
+        "tags": [
+          "Correction"
+        ]
+      }
+    },
+    "/correction_records": {
+      "get": {
+        "summary": "List all Correction Records",
+        "operationId": "listCorrectionRecords",
+        "description": "Retrieves all Correction Records or a filtered list of Correction \nRecords in form of an array. If no query parameters are provided, \nit will return all Correction Records the user has access to.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionRecordListDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/404_not_found"
+          }
+        },
+        "tags": [
+          "Correction Records"
+        ]
+      }
+    },
+    "/correction_records/{id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "id",
+          "description": "A unique identifier for the correction record resource.",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Retrieve a Correction Record",
+        "operationId": "retrieveCorrectionRecord",
+        "description": "Retrieves the details of an existing `Correction Record`. Simply supply a unique correction record ID, and you'll get the corresponding correction record information in return.",
+        "security": [
+          {
+            "OAuth2": [
+              "read:correction_records"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionRecordDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/404_not_found"
+          }
+        },
+        "tags": [
+          "Correction Records"
+        ]
+      }
+    },
+    "/client_correction_bundle": {
+      "get": {
+        "parameters": [
+          {
+            "name": "exerciseId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "summary": "Retrieve a Client Correction Bundle",
+        "operationId": "retrieveClientCorrectionBundle",
+        "description": "Retrieves a `Client Correction Bundle`.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientCorrectionBundleDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400_bad_request"
+          },
+          "401": {
+            "$ref": "#/components/responses/401_unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/404_not_found"
+          }
+        },
+        "tags": [
+          "Client Correction Bundles"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CorrectionBlueprintDTO": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CorrectionBlueprint"
+          }
+        ]
+      },
+      "CorrectionBlueprintListDTO": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CorrectionBlueprintDTO"
+        }
+      },
+      "AutomaticCorrectionImplementationDTO": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AutomaticCorrectionImplementation"
+          }
+        ]
+      },
+      "AutomaticCorrectionImplementationListDTO": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AutomaticCorrectionImplementationDTO"
+        }
+      },
+      "CorrectionRecordDTO": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/AutomaticCorrectionRecordDTO"
+          },
+          {
+            "$ref": "#/components/schemas/ManualCorrectionRecordDTO"
+          },
+          {
+            "$ref": "#/components/schemas/AICorrectionRecordDTO"
+          }
+        ]
+      },
+      "AutomaticCorrectionRecordDTO": {
+        "title": "Automatic Correction Record",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AutmaticCorrectionRecord"
+          }
+        ]
+      },
+      "ManualCorrectionRecordDTO": {
+        "title": "Manual Correction Record",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ManualCorrectionRecord"
+          }
+        ]
+      },
+      "AICorrectionRecordDTO": {
+        "title": "AI Correction Record",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AICorrectionRecord"
+          }
+        ]
+      },
+      "CorrectionRecordListDTO": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CorrectionRecordDTO"
+        }
+      },
+      "ClientCorrectionBundleDTO": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ClientCorrectionBundle"
+          }
+        ]
+      },
+      "AnswerDTO": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/FreeFormAnswerDTO"
+          },
+          {
+            "$ref": "#/components/schemas/MultipleChoiceAnswerDTO"
+          },
+          {
+            "$ref": "#/components/schemas/FillInTheBlankAnswerDTO"
+          },
+          {
+            "$ref": "#/components/schemas/CommandLineAnswerDTO"
+          },
+          {
+            "$ref": "#/components/schemas/CodeSnippetAnswerDTO"
+          },
+          {
+            "$ref": "#/components/schemas/CodebaseAnswerDTO"
+          },
+          {
+            "$ref": "#/components/schemas/DatabaseAnswerDTO"
+          },
+          {
+            "$ref": "#/components/schemas/CodeReviewAnswerDTO"
+          }
+        ]
+      },
+      "FreeFormAnswerDTO": {
+        "title": "Free Form Answer",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FreeFormAnswer"
+          }
+        ]
+      },
+      "MultipleChoiceAnswerDTO": {
+        "title": "Multiple Choice Answer",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MultipleChoiceAnswer"
+          }
+        ]
+      },
+      "FillInTheBlankAnswerDTO": {
+        "title": "Fill In The Blank Answer",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FillInTheBlankAnswer"
+          }
+        ]
+      },
+      "CommandLineAnswerDTO": {
+        "title": "Command Line Answer",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CommandLineAnswer"
+          }
+        ]
+      },
+      "CodeSnippetAnswerDTO": {
+        "title": "Code Snippet Answer",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CodeSnippetAnswer"
+          }
+        ]
+      },
+      "CodebaseAnswerDTO": {
+        "title": "Codebase Answer",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CodebaseAnswer"
+          }
+        ]
+      },
+      "DatabaseAnswerDTO": {
+        "title": "Database Answer",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DatabaseAnswer"
+          }
+        ]
+      },
+      "CodeReviewAnswerDTO": {
+        "title": "Code Review Answer",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CodeReviewAnswer"
+          }
+        ]
+      },
+      "FeedbackDTO": {
+        "title": "Feedback",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Feedback"
+          }
+        ]
+      },
+      "id": {
+        "description": "Unique identifier for the object.",
+        "type": "string",
+        "example": "_ZZrEOIjc2kK3159uVMqxdw"
+      },
+      "timestamp": {
+        "description": "Date and Time at which the object was created. Measured in milliseconds since the Unix epoch.",
+        "type": "integer",
+        "example": 1581554917050,
+        "minimum": 0
+      },
+      "userId": {
+        "description": "Unique identifier for a user.",
+        "type": "string",
+        "example": "auth0|5e34cd09afb6530e2a739a9f"
+      },
+      "ExerciseTypes": {
+        "title": "type",
+        "description": "Different kinds of exercises.",
+        "type": "string",
+        "enum": [
+          "free_form",
+          "multiple_choice",
+          "fill_in_the_blank",
+          "command_line",
+          "code_snippet",
+          "codebase",
+          "database",
+          "code_review"
+        ]
+      },
+      "File": {
+        "title": "File",
+        "type": "object",
+        "description": "An object with information about a file.",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "created": {
+            "$ref": "#/components/schemas/timestamp"
+          },
+          "title": {
+            "description": "A user friendly title for the file.",
+            "maxLength": 280,
+            "nullable": true,
+            "type": "string"
+          },
+          "filename": {
+            "description": "A filename for the file, suitable for saving to a filesystem.",
+            "nullable": true,
+            "type": "string"
+          },
+          "type": {
+            "description": "String representing the object's type. Objects of the same type share the same value.",
+            "enum": [
+              "file"
+            ],
+            "type": "string",
+            "example": "file"
+          },
+          "size": {
+            "description": "The size in bytes of the file object.",
+            "type": "integer"
+          },
+          "fileFormat": {
+            "title": "fileFormat",
+            "description": "The specific information encoding method used.",
+            "enum": [
+              "jpg",
+              "png"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "url": {
+            "description": "The URL from which the file can be downloaded using your live secret API key.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "created",
+          "type",
+          "url",
+          "size"
+        ]
+      },
+      "RequirementPersona": {
+        "title": "Requirement Persona",
+        "description": "A persona representing a theoretical person in a certain position \nthat's most likely to provide you with a particular requirement.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "name": {
+            "description": "A semi-random name given to represent the persona.",
+            "type": "string",
+            "example": "John Johnson"
+          },
+          "role": {
+            "description": "The role of a particular person.",
+            "type": "string",
+            "enum": [
+              "lead_developer",
+              "lead_designer",
+              "project_manager"
+            ]
+          },
+          "avatar": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/File"
+              }
+            ]
+          }
+        }
+      },
+      "ExpressionTypes": {
+        "title": "type",
+        "description": "Different kinds of expressions.",
+        "enum": [
+          "text",
+          "math",
+          "code",
+          "image",
+          "audio",
+          "animation",
+          "video"
+        ],
+        "type": "string"
+      },
+      "Expression": {
+        "title": "Expression",
+        "description": "An expression is a captured moment of menaingful communication - in a speficic medium and/or form.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "readOnly": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/id"
+              }
+            ]
+          },
+          "created": {
+            "readOnly": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/timestamp"
+              }
+            ]
+          },
+          "creator": {
+            "readOnly": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/userId"
+              }
+            ]
+          },
+          "type": {
+            "$ref": "#/components/schemas/ExpressionTypes"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "TestCaseTypes": {
+        "title": "Test Case Types",
+        "description": "the typue of test case",
+        "type": "string",
+        "enum": [
+          "code_quality",
+          "custom",
+          "io",
+          "unit"
+        ]
+      },
+      "DebuggingInfo": {
+        "title": "Debugging Info",
+        "description": "The tests used to automaticaly correct the requirements",
+        "type": "object",
+        "properties": {
+          "showTestCaseInput": {
+            "title": "showTestCaseInput",
+            "description": "Whether to show the input to the student or not.",
+            "type": "boolean"
+          },
+          "showCompilerStackTrace": {
+            "title": "showCompilerStackTrace",
+            "description": "Whether to show the compiler/debug output to the student or not.",
+            "type": "boolean"
+          },
+          "showExercutionStackTrace": {
+            "title": "showExercutionStackTrace",
+            "description": "Whether to show the exercution output to the student or not.",
+            "type": "boolean"
+          },
+          "showStudentSolutionOutput": {
+            "title": "showStudentSolutionOutput",
+            "description": "Whether to show the output of the student's code to the student or not.",
+            "type": "boolean"
+          },
+          "showExpectedSolutionOutput": {
+            "title": "showExpectedSolutionOutput",
+            "description": "Whether to show the expected output to the student or not.",
+            "type": "boolean"
+          },
+          "showOutputDifference": {
+            "title": "showOutputDifference",
+            "description": "Whether to show the difference between the supplied and expected output to the student or not.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "showCompilerStackTrace",
+          "showExercutionStackTrace",
+          "showExpectedSolutionOutput",
+          "showOutputDifference",
+          "showStudentSolutionOutput",
+          "showTestCaseInput"
+        ]
+      },
+      "TestCase": {
+        "title": "Test Case",
+        "description": "The tests used to automaticaly correct the requirements. The test \ncase is like the implementation of the interface defined in a \nrequirement. More specifically, a test case provides an implementation \nin the realm of automatic correction. Since test cases are very specific \nthey don't need much contextual information in order to be executed.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "created": {
+            "$ref": "#/components/schemas/timestamp"
+          },
+          "creator": {
+            "$ref": "#/components/schemas/userId"
+          },
+          "type": {
+            "$ref": "#/components/schemas/TestCaseTypes"
+          },
+          "visibility": {
+            "title": "visibility",
+            "description": "Whether or not to show the test case.",
+            "enum": [
+              "Fully Hidden",
+              "Partially Hidden",
+              "Visible"
+            ],
+            "type": "string"
+          },
+          "explainCommonErrors": {
+            "title": "explainCommonErrors",
+            "description": "Whether or not to explain universal and common errors.",
+            "type": "boolean"
+          },
+          "studentDebuggingInfo": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DebuggingInfo"
+              },
+              {
+                "title": "studentDebuggingInfo"
+              },
+              {
+                "description": "Debugging info"
+              }
+            ]
+          },
+          "successThreshold": {
+            "title": "successThreshold",
+            "description": "The percentage required to consider the test case passed.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "explainCommonErrors",
+          "id",
+          "studentDebuggingInfo",
+          "successThreshold",
+          "type",
+          "visibility"
+        ]
+      },
+      "Feedback": {
+        "title": "Feedback",
+        "description": "Content and emotion produced in reaction to something. The materialization of something felt or thought in response to a situation or event. It can be affirmative, constructive, etc.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "created": {
+            "$ref": "#/components/schemas/timestamp"
+          },
+          "creator": {
+            "$ref": "#/components/schemas/userId"
+          },
+          "emoji": {
+            "title": "emoji",
+            "description": "A representation of the emotional state associated with the feedback message.",
+            "type": "string"
+          },
+          "description": {
+            "title": "description",
+            "description": "A set of expressions combined to form a rich feedback message.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Expression"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "created",
+          "description"
+        ]
+      },
+      "Requirement": {
+        "title": "Requirement",
+        "description": "A specific element you expect to be part of a correct solution. A \nrequirement is like an interface - it defines what should be tested, \nbut it is not the implementation of the test itself. This allows us to \napply different approaches to testing the same set of things (e.g. \nmanual correction, automatic correction, ai correction, etc.), and to \ncompare these approaches and implementations with each other.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "title": {
+            "description": "A indicative text for the requirement.",
+            "type": "string"
+          },
+          "persona": {
+            "description": "Referring to a type of person and their characteristics.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RequirementPersona"
+              }
+            ]
+          },
+          "description": {
+            "description": "A list of expressions with more information about the requirement.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Expression"
+            }
+          },
+          "safe_to_show": {
+            "description": "Determines if this requirement is safe to show to the exercise taker while answering the exercise.",
+            "type": "boolean",
+            "default": false
+          },
+          "weight": {
+            "description": "A number signifying the importance of the requirement relative to other requirements.",
+            "type": "number"
+          },
+          "automaticTests": {
+            "description": "The automatic test cases to run to correct for the requirement.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestCase"
+            }
+          },
+          "failureResponses": {
+            "description": "A set of potential feedback objects to display to students upon failing requirement.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Feedback"
+            }
+          }
+        }
+      },
+      "CorrectionBlueprint": {
+        "title": "CorrectionBlueprint",
+        "description": "The blueprint for how to correct an answer to an exercise.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "readOnly": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/id"
+              }
+            ]
+          },
+          "created": {
+            "readOnly": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/timestamp"
+              }
+            ]
+          },
+          "creator": {
+            "$ref": "#/components/schemas/userId"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ExerciseTypes"
+          },
+          "allowAutomaticCorrection": {
+            "description": "Whether to allow automatic correction or not.",
+            "type": "boolean"
+          },
+          "allowManualCorrection": {
+            "description": "Whether to allow manual correction or not.",
+            "type": "boolean"
+          },
+          "allowAICorrection": {
+            "description": "Whether to allow artificial intelligence correction or not.",
+            "type": "boolean"
+          },
+          "requirements": {
+            "description": "A list of requirements to be corrected for",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Requirement"
+            }
+          }
+        },
+        "required": [
+          "created",
+          "id",
+          "requirements",
+          "type"
+        ]
+      },
+      "AutomaticCorrectionImplementation": {
+        "title": "Automatic Correction Implementation",
+        "description": "The automatic correction implementation contains a bundle of test cases that provide a possible implementation to the correction blueprint proposed by the correction blueprint creator.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "created": {
+            "$ref": "#/components/schemas/timestamp"
+          },
+          "creator": {
+            "$ref": "#/components/schemas/userId"
+          },
+          "model": {
+            "description": "The key is an requirement id from the correction blueprint, and the value is a set of test cases.",
+            "type": "string",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AnswerTypes": {
+        "title": "answer type",
+        "description": "The shape of an answer is based on the type of exercise (and, potentially at some point, a choice of expression selected by the user).",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ExerciseTypes"
+          }
+        ]
+      },
+      "Answer": {
+        "title": "Answer",
+        "description": "An answer provides a potential solution produced in response to interpreting \nan exercise. In other words, it's a response that attempts to answer the \nproblem stated in the exercise description.\n",
+        "type": "object",
+        "properties": {
+          "id": {
+            "readOnly": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/id"
+              }
+            ]
+          },
+          "creator": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/userId"
+              }
+            ]
+          },
+          "exerciseId": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/id"
+              }
+            ]
+          },
+          "created": {
+            "readOnly": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/timestamp"
+              }
+            ]
+          },
+          "status": {
+            "title": "status",
+            "description": "Correction/validation stage, going by whether the answer has been.",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Automatically Corrected",
+                "Manually & Automatically Corrected",
+                "Manually Corrected",
+                "Needs Correction"
+              ]
+            },
+            "type": "string",
+            "example": "Needs Correction"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AnswerTypes"
+          }
+        },
+        "required": [
+          "created",
+          "id",
+          "status",
+          "type"
+        ]
+      },
+      "FreeFormAnswer": {
+        "title": "Free Form Answer",
+        "description": "... constituting an answer to a `Free Form Exercise`.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Answer"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "MultipleChoiceAnswer": {
+        "title": "Multiple Choice Answer",
+        "description": "... constituting an answer to a `Multiple Choice Exercise`.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Answer"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "FillInTheBlankAnswer": {
+        "title": "Fill In The Blank Answer",
+        "description": "... constituting an answer to a `Fill In The Blank Exercise`.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Answer"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "CommandLineAnswer": {
+        "title": "Command Line Answer",
+        "description": "... constituting an answer to a `Command Line Exercise`.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Answer"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "CodeSnippetAnswer": {
+        "title": "Code Snippet Answer",
+        "description": "... constituting an answer to a `Code Snippet Exercise`.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Answer"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "CodebaseAnswer": {
+        "title": "Codebase Answer",
+        "description": "Files and folders (filesystem) constituting an answer to a `Codebase Exercise`.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Answer"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "archive": {
+                "description": "The answer in the form of an archived file system.",
+                "type": "string",
+                "format": "byte",
+                "example": "codebase.zip"
+              },
+              "archiveFormat": {
+                "description": "The type of archive. Currently only supporting zip files.",
+                "type": "string",
+                "enum": [
+                  "zip"
+                ],
+                "example": "zip"
+              }
+            },
+            "required": [
+              "archive",
+              "archiveFormat"
+            ]
+          }
+        ]
+      },
+      "DatabaseAnswer": {
+        "title": "Database Answer",
+        "description": "... constituting an answer to a `Database Exercise`.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Answer"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "CodeReviewAnswer": {
+        "title": "Code Review Answer",
+        "description": "... constituting an answer to a `Code Review Exercise`.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Answer"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      },
+      "CorrectionRecordType": {
+        "title": "Correction Record Type",
+        "description": "the typue of test case",
+        "type": "string",
+        "enum": [
+          "automatic",
+          "manual",
+          "ai"
+        ]
+      },
+      "CorrectionRecord": {
+        "title": "CorrectionRecord",
+        "description": "The model for a recorded correction result.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "created": {
+            "$ref": "#/components/schemas/timestamp"
+          },
+          "type": {
+            "$ref": "#/components/schemas/CorrectionRecordType"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "AutmaticCorrectionRecord": {
+        "title": "AutmaticCorrectionRecord",
+        "description": "The model for recorded automatic correction results.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CorrectionRecord"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CorrectionRecordType"
+                  },
+                  {
+                    "example": "automatic"
+                  }
+                ]
+              },
+              "execution_details": {
+                "description": "Detailed logs and outputs of the execution of the correction script(s).",
+                "type": "object",
+                "properties": {
+                  "testCaseInput": {
+                    "description": "The input of the test case.",
+                    "type": "string"
+                  },
+                  "compilerStackTrace": {
+                    "description": "Whether to show the compiler/debug output to the student or not.",
+                    "type": "string"
+                  },
+                  "exercutionStackTrace": {
+                    "description": "Whether to show the exercution output to the student or not.",
+                    "type": "string"
+                  },
+                  "studentSolutionOutput": {
+                    "description": "Whether to show the output of the student's code to the student or not.",
+                    "type": "string"
+                  },
+                  "expectedSolutionOutput": {
+                    "description": "Whether to show the expected output to the student or not.",
+                    "type": "string"
+                  },
+                  "outputDifference": {
+                    "description": "Whether to show the difference between the supplied and expected output to the student or not.",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ManualCorrectionRecord": {
+        "title": "Manual Correction Record",
+        "description": "The model for a recorded manual correction results.",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CorrectionRecord"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "something": {
+                "description": "some value required",
+                "type": "string"
+              },
+              "type": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CorrectionRecordType"
+                  },
+                  {
+                    "example": "manual"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "something"
+            ]
+          }
+        ]
+      },
+      "AICorrectionRecord": {
+        "title": "AI Correction Record",
+        "description": "The model for a recorded AI correction results.",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CorrectionRecord"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "something": {
+                "description": "some value required",
+                "type": "string"
+              },
+              "type": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CorrectionRecordType"
+                  },
+                  {
+                    "example": "ai"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "something"
+            ]
+          }
+        ]
+      },
+      "ClientCorrectionBundle": {
+        "title": "Correction Bundle",
+        "description": "An object containing mainly key-value pairs of answer hashes and feedback.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "model": {
+            "description": "The object containing mainly key-value pairs of answer hashes and feedback.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Feedback"
+              }
+            },
+            "example": {
+              "1bee69a46ba811185c194762abaeae90": [
+                "{...feedback object 1}",
+                "{...feedback object 2}"
+              ],
+              "b86e130ce7028da59e672d56ad0113df": [
+                "{...feedback object 1}"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "400_bad_request": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "There seems to be something wrong with your request."
+                }
+              }
+            }
+          }
+        }
+      },
+      "401_unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Seems like you aren't authenticated. Please authenticate yoruself, then try again."
+                }
+              }
+            }
+          }
+        }
+      },
+      "404_not_found": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Seems like the resource you requested doesn't exist."
+                }
+              }
+            }
+          }
+        }
+      },
+      "bad_request_400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "There seems to be something wrong with your request."
+                }
+              }
+            }
+          }
+        }
+      },
+      "unauthorized_401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Seems like you aren't authenticated. Please authenticate yoruself, then try again."
+                }
+              }
+            }
+          }
+        }
+      },
+      "not_found_404": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Seems like the resource you requested doesn't exist."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://diggit.eu.auth0.com/authorize",
+            "tokenUrl": "https://diggit.eu.auth0.com/oauth/token",
+            "scopes": {
+              "write:correction_blueprints": "create or update correction blueprints",
+              "read:correction_blueprints": "retrieve correction blueprints",
+              "write:automatic_correction_implementations": "create or update automatic correction implementations",
+              "read:automatic_correction_implementations": "retrieve automatic correction implementations",
+              "read:correction_records": "retrieve correction logs",
+              "read:client_correction_bundles": "retrieve client correction bundles"
+            }
+          }
+        }
+      }
+    }
+  }
+}
