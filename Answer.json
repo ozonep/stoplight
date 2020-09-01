@@ -3,7 +3,7 @@
   "info": {
     "title": "Answer Service",
     "version": "0.1.0",
-    "description": "Answers are responses to exercises. Some of them are correct, some of them not.\nThe Answer Service deals with everything that's necessary to keep track of \nanswers to exercises over time. Also, let's test git integration!\n\n# Introduction\n\nThe answers service handles some advanced processing of certain answers. For example, an \nanswer to the popular codebase exercise type requires processing of archived files usually\nin a zip file, and then a translation into multiple post requests for each file that has \nchanged since the last posted answer to the same exercise.\n\n# Answer Types\n\nThe structure of answers depends on the exercise types they answer. The exercise \ntypes which form the basis for answer types can be seen below.\n\n<p align=\"center\">\n  <img alt=\"exercise types\" src=\"/spec-assets/exercise-types.svg\" />\n</p>\n\n# Authentication\n\nThis API supports OAuth2, and more specifically, the implicit flow.\n\n\n<!-- ReDoc-Inject: <security-definitions> -->\n",
+    "description": "Answers are responses to exercises. Some of them are correct, some of them not.\nThe Answer Service deals with everything that's necessary to keep track of \nanswers to exercises over time.\n\n# Introduction\n\nThe answers service handles some advanced processing of certain answers. Its main goal is to provide a unified and simple interface - abstracting away the complexities inherent in storing multiple different answers in multiple different formats.\n\n# Answer Types\n\nThe structure of answers depends on the exercise types they answer. The exercise \ntypes which form the basis for answer types can be seen below.\n\n<p align=\"center\">\n  <img alt=\"exercise types\" src=\"/spec-assets/exercise-types.svg\" />\n</p>\n\n# Authentication\n\nThis API supports OAuth2, and more specifically, the implicit flow.\n\n\n<!-- ReDoc-Inject: <security-definitions> -->\n",
     "contact": {
       "name": "Developer @Sci-Code",
       "url": "https://sci-code.com",
@@ -79,6 +79,14 @@
               }
             },
             "description": "The specific exercises you want to retrieve answers for. This will limit answers to only those posted to those exercises."
+          },
+          {
+            "schema": {
+              "type": "boolean"
+            },
+            "in": "query",
+            "name": "evaluated",
+            "description": "Filter answers based on being evaluated or not."
           }
         ],
         "responses": {
@@ -454,9 +462,9 @@
             "type": "object",
             "properties": {
               "archive": {
-                "description": "The answer in the form of an archived file system.",
                 "type": "string",
-                "format": "byte",
+                "description": "The answer in the form of an archived file system.",
+                "format": "binary",
                 "example": "codebase.zip"
               },
               "archiveFormat": {
@@ -473,7 +481,19 @@
               "archiveFormat"
             ]
           }
-        ]
+        ],
+        "x-examples": {
+          "example-1": {
+            "id": "_ZZrEOIjc2kK3159uVMqxdw",
+            "creator": "auth0|5e34cd09afb6530e2a739a9f",
+            "exerciseId": "_ZZrEOIjc2kK3159uVMqxdw",
+            "created": 1581554917050,
+            "status": "Needs Correction",
+            "type": "free_form",
+            "archive": "codebase.zip",
+            "archiveFormat": "zip"
+          }
+        }
       },
       "DatabaseAnswer": {
         "title": "Database Answer",
