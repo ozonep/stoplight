@@ -368,15 +368,6 @@
           "status": {
             "title": "status",
             "description": "Correction/validation stage, going by whether the answer has been.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "Automatically Corrected",
-                "Manually & Automatically Corrected",
-                "Manually Corrected",
-                "Needs Correction"
-              ]
-            },
             "type": "string",
             "example": "Needs Correction"
           },
@@ -385,8 +376,8 @@
           }
         },
         "required": [
-          "created",
           "id",
+          "created",
           "status",
           "type"
         ]
