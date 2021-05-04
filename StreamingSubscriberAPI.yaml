@@ -1,0 +1,58 @@
+openapi: 3.0.0
+info:
+  title: StreamingSubscriberAPI
+  version: '1.0'
+  contact:
+    name: Allente
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /sub:
+    parameters: []
+    put:
+      summary: ''
+      operationId: put-sub
+      responses:
+        '200':
+          description: OK
+      description: 'Receives data '
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+components:
+  schemas:
+    Subscription:
+      title: Subscription
+      type: object
+      description: ''
+      x-examples:
+        Alice Smith:
+          id: 142
+          firstName: Alice
+          lastName: Smith
+          email: alice.smith@gmail.com
+          dateOfBirth: '1997-10-31'
+          emailVerified: true
+          signUpDate: '2019-08-24'
+      properties:
+        customerId:
+          type: string
+          description: Unique identifier for the given user.
+        streamingProviderIds:
+          type: array
+          items:
+            type: integer
+        StreamingProviderProductIds:
+          type: array
+          items:
+            type: integer
+        AllenteProductBundle:
+          type: integer
+          format: email
+      required:
+        - customerId
+        - streamingProviderIds
+        - StreamingProviderProductIds
+        - AllenteProductBundle
