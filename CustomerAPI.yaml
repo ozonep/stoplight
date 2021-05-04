@@ -1,0 +1,106 @@
+openapi: 3.0.1
+info:
+  title: Allente API for customer information
+  version: '1.0'
+  description: Provides Customer information
+  contact:
+    name: Allente
+servers:
+  - url: 'https://ysmnjbm7a4.execute-api.eu-central-1.amazonaws.com/mock'
+    description: Mock server
+paths:
+  '/customer/{customerId}/{streamingProviderIds}/{StreamingProviderProductIds}':
+    get:
+      operationId: getCustomerInfo
+      summary: Get customer information including product ids.
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: StreamingProviderProductIds
+          in: path
+          required: true
+          schema:
+            type: array
+        - name: streamingProviderIds
+          in: path
+          required: true
+          schema:
+            type: array
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json; charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Customer'
+      description: Fetch customer data
+    put:
+      operationId: updateCustomerInfo
+      summary: Update customer information including product ids.
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: StreamingProviderProductIds
+          in: path
+          required: true
+          schema:
+            type: array
+        - name: streamingProviderIds
+          in: path
+          required: true
+          schema:
+            type: array
+      responses:
+        '204':
+          description: 204 response
+          content:
+            application/json; charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Customer'
+      description: Update Customer data
+    parameters:
+      - schema:
+          type: string
+        name: customerId
+        in: path
+        required: true
+      - schema:
+          type: array
+          uniqueItems: true
+          minItems: 1
+        name: streamingProviderIds
+        in: path
+        required: true
+      - schema:
+          type: array
+          uniqueItems: true
+          minItems: 1
+        name: StreamingProviderProductIds
+        in: path
+        required: true
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        name:
+          type: string
+        emailAddress:
+          type: string
+        StreamingProviderProductIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+        streamingProviderIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+  securitySchemes: {}
