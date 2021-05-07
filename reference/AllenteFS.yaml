@@ -38,9 +38,10 @@ components:
       properties:
         availableBundles:
           type: array
-          minItems: 1
+          minItems: 6
           uniqueItems: true
           description: All the available bundles in case user decides to ignore recommendations
+          maxItems: 6
           items:
             type: string
             enum:
@@ -53,6 +54,9 @@ components:
         recommendedBundles:
           type: array
           description: Array of recommended bundles based on user's preferences
+          minItems: 1
+          maxItems: 6
+          uniqueItems: true
           items:
             $ref: '#/components/schemas/Bundle'
       required:
