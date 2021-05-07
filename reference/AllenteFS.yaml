@@ -12,7 +12,7 @@ paths:
   /recommend:
     parameters: []
     post:
-      summary: ''
+      summary: Request Recommendation
       operationId: post-recommend
       responses:
         '200':
@@ -21,6 +21,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Recommendation'
+        '417':
+          description: Expectation Failed
       requestBody:
         content:
           application/json:
