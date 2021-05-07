@@ -1,0 +1,85 @@
+openapi: 3.1.0
+info:
+  title: AllenteFS
+  version: '1.0'
+  description: This is Recommendation API spec file for Allente Fullstack challenge
+  contact:
+    name: Allente
+  license: {}
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /recommend:
+    parameters: []
+    post:
+      summary: ''
+      operationId: post-recommend
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recommendation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Likes'
+        description: ''
+      description: POST request for getting recommendations
+components:
+  schemas:
+    Recommendation:
+      title: Recommendation
+      type: object
+      properties:
+        availableBundles:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          description: All the available bundles in case user decides to ignore recommendations
+          items:
+            type: string
+            enum:
+              - large
+              - basic
+              - kids
+              - education
+              - premiere
+              - tvseries
+        recommendedBundles:
+          type: array
+          description: Array of recommended bundles based on user's preferences
+          items:
+            type: string
+            enum:
+              - large
+              - basic
+              - kids
+              - education
+              - premiere
+              - tvseries
+      required:
+        - availableBundles
+        - recommendedBundles
+    Likes:
+      title: Likes
+      type: object
+      properties:
+        likes:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          maxItems: 6
+          items:
+            type: string
+            enum:
+              - sport
+              - movies
+              - series
+              - kids
+              - new
+              - documentary
+      required:
+        - likes
