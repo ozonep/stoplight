@@ -54,14 +54,7 @@ components:
           type: array
           description: Array of recommended bundles based on user's preferences
           items:
-            type: string
-            enum:
-              - large
-              - basic
-              - kids
-              - education
-              - premiere
-              - tvseries
+            $ref: '#/components/schemas/Bundle'
       required:
         - availableBundles
         - recommendedBundles
@@ -85,3 +78,36 @@ components:
               - documentary
       required:
         - likes
+    Bundle:
+      title: Bundle
+      type: object
+      properties:
+        id:
+          type: string
+          enum:
+            - large
+            - basic
+            - kids
+            - education
+            - premiere
+            - tvseries
+          description: id of the bundle
+        price:
+          type: string
+          description: price in NOK
+        name:
+          type: string
+          description: Title for the bundle card
+        descripton:
+          type: string
+          description: Description for the bundle card
+        imageUrl:
+          type: string
+          format: uri
+          description: URL for the bundle image
+      required:
+        - id
+        - price
+        - name
+        - descripton
+        - imageUrl
