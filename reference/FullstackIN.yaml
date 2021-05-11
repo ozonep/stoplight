@@ -1,0 +1,118 @@
+openapi: 3.1.0
+info:
+  title: FullstackIN
+  version: '1.0'
+  description: This is specification for an API that should serve data for the front-end chart
+  contact:
+    name: IN
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /companies:
+    parameters: []
+    get:
+      summary: Get list of all companies
+      tags: []
+      responses:
+        '200':
+          description: List of companies
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 1
+                items:
+                  $ref: '#/components/schemas/Company'
+              examples:
+                Get User Alice Smith:
+                  value:
+                    id: 142
+                    firstName: Alice
+                    lastName: Smith
+                    email: alice.smith@gmail.com
+                    dateOfBirth: '1997-10-31'
+                    emailVerified: true
+                    signUpDate: '2019-08-24'
+        '500':
+          description: Something went wrong
+      operationId: get-users-userId
+      description: Retrieve array of companies.
+  /individuals:
+    get:
+      summary: ''
+      operationId: get-user
+      responses:
+        '200':
+          description: List of individuals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Individual'
+        '500':
+          description: Something went wrong
+      description: Retrieve array of individuals
+    parameters: []
+components:
+  schemas:
+    Company:
+      title: Company
+      type: object
+      description: ''
+      examples:
+        - id: 142
+          firstName: Alice
+          lastName: Smith
+          email: alice.smith@gmail.com
+          dateOfBirth: '1997-10-31'
+          emailVerified: true
+          signUpDate: '2019-08-24'
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the given company.
+        name:
+          type: string
+          description: Name of the company
+        agent:
+          type: string
+          description: Full name of company's agent
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+        meetingDate:
+          type: string
+      required:
+        - id
+        - name
+        - agent
+        - gender
+    Individual:
+      title: Individual
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique id of a person
+        name:
+          type: string
+          description: First name of a person
+        surname:
+          type: string
+          description: Person's surname
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+        meetingDate:
+          type: string
+      required:
+        - id
+        - name
+        - surname
+        - gender
+        - meetingDate
