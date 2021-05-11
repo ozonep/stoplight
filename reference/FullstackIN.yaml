@@ -24,15 +24,18 @@ paths:
                 items:
                   $ref: '#/components/schemas/Company'
               examples:
-                Get User Alice Smith:
+                Example:
                   value:
-                    id: 142
-                    firstName: Alice
-                    lastName: Smith
-                    email: alice.smith@gmail.com
-                    dateOfBirth: '1997-10-31'
-                    emailVerified: true
-                    signUpDate: '2019-08-24'
+                    - id: 1
+                      name: Google
+                      agent: Adam Smith
+                      gender: male
+                      meetingDate: '2021-10-31'
+                    - id: 2
+                      name: Netflix
+                      agent: Simen Newton
+                      gender: feale
+                      meetingDate: '2021-04-11'
         '500':
           description: Something went wrong
       operationId: get-users-userId
