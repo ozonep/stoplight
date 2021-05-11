@@ -88,11 +88,13 @@ components:
             - female
         meetingDate:
           type: string
+          format: date
       required:
         - id
         - name
         - agent
         - gender
+        - meetingDate
     Individual:
       title: Individual
       type: object
@@ -113,6 +115,7 @@ components:
             - female
         meetingDate:
           type: string
+          format: date
       required:
         - id
         - name
