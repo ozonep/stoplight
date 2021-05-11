@@ -62,7 +62,7 @@ components:
     Company:
       title: Company
       type: object
-      description: ''
+      description: Model of company entry
       examples:
         - id: 142
           firstName: Alice
@@ -95,6 +95,13 @@ components:
         - agent
         - gender
         - meetingDate
+      x-examples:
+        example-1:
+          id: 1
+          name: Google
+          agent: Adam Smith
+          gender: male
+          meetingDate: '2020-10-31'
     Individual:
       title: Individual
       type: object
@@ -122,3 +129,4 @@ components:
         - surname
         - gender
         - meetingDate
+      description: Model of Individual entry
