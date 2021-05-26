@@ -2,11 +2,12 @@ openapi: 3.1.0
 info:
   title: FullstackIN
   version: '1.0'
-  description: This is specification for an API that should serve data for the front-end chart
+  description: This specification describes the API that is used to serve data for the front-end chart
   contact:
     name: IN
 servers:
   - url: 'http://localhost:3000'
+    description: Basic local server
 paths:
   /companies:
     parameters: []
@@ -28,18 +29,18 @@ paths:
                   value:
                     - id: 1
                       name: Google
-                      agent: Adam Smith
+                      advisor: Adam Smith
                       gender: male
                       meetingDate: '2021-10-31'
                     - id: 2
                       name: Netflix
-                      agent: Simen Newton
-                      gender: feale
+                      advisor: Simen Newton
+                      gender: female
                       meetingDate: '2021-04-11'
         '500':
           description: Something went wrong
       operationId: get-users-userId
-      description: Retrieve array of companies.
+      description: Retrieve a list of companies
   /individuals:
     get:
       summary: ''
@@ -53,9 +54,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Individual'
+              examples:
+                example-1:
+                  value:
+                    - id: 1
+                      name: Ivan
+                      surname: Malkov
+                      gender: male
+                      meetingDate: '2019-08-24'
         '500':
           description: Something went wrong
-      description: Retrieve array of individuals
+      description: Retrieve a list of individuals
     parameters: []
 components:
   schemas:
@@ -63,6 +72,13 @@ components:
       title: Company
       type: object
       description: Model of company entry
+      x-examples:
+        example-1:
+          id: 1
+          name: Google
+          agent: Adam Smith
+          gender: male
+          meetingDate: '2020-10-31'
       properties:
         id:
           type: integer
@@ -70,9 +86,9 @@ components:
         name:
           type: string
           description: Name of the company
-        agent:
+        advisor:
           type: string
-          description: Full name of company's agent
+          description: Full name of company's advisor
         gender:
           type: string
           enum:
@@ -84,16 +100,9 @@ components:
       required:
         - id
         - name
-        - agent
+        - advisor
         - gender
         - meetingDate
-      x-examples:
-        example-1:
-          id: 1
-          name: Google
-          agent: Adam Smith
-          gender: male
-          meetingDate: '2020-10-31'
     Individual:
       title: Individual
       type: object
