@@ -79,17 +79,35 @@ paths:
 components:
   schemas:
     Movie:
-      title: User
+      title: Movie Model
       type: object
       description: ''
       examples:
-        - id: 142
-          firstName: Alice
-          lastName: Smith
-          email: alice.smith@gmail.com
-          dateOfBirth: '1997-10-31'
-          emailVerified: true
-          signUpDate: '2019-08-24'
+        - id: 8127453
+          details:
+            director:
+              - Ben Winston
+            cast:
+              - Lisa Kudrow
+              - Jennifer Aniston
+              - David Schwimmer
+            year: 2021
+            length: 103
+            channelId: hbo
+          publishDate: '2021-05-27T09:01:00+0200'
+          contentType: video
+          title: 'Friends: The Reunion'
+          description:
+            short: An unscripted Friends reunion special.
+            long: 'Our favorite friends are back on the set where it all started. Jennifer Aniston, Courteney Cox, Lisa Kudrow, Matt LeBlanc, Matthew Perry, David Schwimmer and other invited guests are reunited for an impromptu tribute to the beloved show.'
+          images:
+            background:
+              url: 'https://cd-static2.telenorcdn.net/zuul/dis-api//4o2-jhb2sULGEvnHxorjy6iepSA=/60x86/smart/cdn-cd-production.cloud.xstream.dk/thumbnails/2021/05/27/1622108701017768900.jpg'
+          tags:
+            - hd
+          genres:
+            - Documentary
+            - Comedy
       properties:
         id:
           type: integer
