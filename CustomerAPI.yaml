@@ -6,7 +6,7 @@ info:
   contact:
     name: Allente
 servers:
-  - url: 'https://ysmnjbm7a4.execute-api.eu-central-1.amazonaws.com/mock'
+  - url: 'https://stoplight.io/mocks/sci-code/diggit:master/10924359'
     description: Mock server
 paths:
   '/customer/{customerId}/{streamingProviderIds}/{StreamingProviderProductIds}':
