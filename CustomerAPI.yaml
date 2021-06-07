@@ -88,25 +88,6 @@ components:
   schemas:
     Customer:
       type: object
-      properties:
-        name:
-          type: string
-        emailAddress:
-          type: string
-        StreamingProviderProductIds:
-          type: array
-          uniqueItems: true
-          minItems: 1
-          items:
-            type: integer
-            format: int32
-        streamingProviderIds:
-          type: array
-          minItems: 1
-          uniqueItems: true
-          items:
-            type: integer
-            format: int32
       examples:
         - name: Michael Simmons
           emailAddress: simmons@diggit.no
@@ -116,4 +97,36 @@ components:
           streamingProviderIds:
             - 37
             - 29
+      properties:
+        name:
+          type: string
+          example: Michael
+          minLength: 2
+          maxLength: 30
+        emailAddress:
+          type: string
+          format: email
+          example: simmons@diggit.no
+          minLength: 3
+        StreamingProviderProductIds:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 30
+          items:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 99999
+        streamingProviderIds:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          maxItems: 15
+          items:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            example: 7
   securitySchemes: {}
