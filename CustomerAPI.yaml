@@ -41,7 +41,7 @@ paths:
                     activeServices:
                       - HBO
                       - Warner
-      description: Fetch customer data
+      description: Fetch customer object
     put:
       operationId: updateCustomerInfo
       summary: Update customer information including product ids.
