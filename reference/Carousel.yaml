@@ -253,8 +253,7 @@ paths:
                       genres:
                         - Drama
           headers: {}
-      x-internal: true
-      description: Get pre-defined array of movies for front-end challenge
+      description: Get pre-defined array of movies. This route is for front-end challenge only!
 components:
   schemas:
     Movie:
