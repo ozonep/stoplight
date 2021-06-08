@@ -27,19 +27,36 @@ paths:
             application/json; charset=UTF-8:
               schema:
                 $ref: '#/components/schemas/Response'
-              examples: {}
+              examples:
+                example-200:
+                  value:
+                    httpCode: '200'
+                    reasonCode: OK
+                    message: Success!
         '400':
           description: The server cannot or will not process the request due to something that is perceived to be a client error. See details in response body.
           content:
             application/json; charset=UTF-8:
               schema:
                 $ref: '#/components/schemas/Response'
+              examples:
+                example-400:
+                  value:
+                    httpCode: '400'
+                    reasonCode: INVALID_REQUEST
+                    message: Bad request
         '500':
           description: Internal server error. Please try again later.
           content:
             application/json; charset=UTF-8:
               schema:
                 $ref: '#/components/schemas/Response'
+              examples:
+                example-500:
+                  value:
+                    httpCode: '500'
+                    reasonCode: INTERNAL_SERVER_ERROR
+                    message: Oops...
       description: ''
 components:
   schemas:
