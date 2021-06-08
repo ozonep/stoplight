@@ -27,14 +27,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Customer'
               examples:
-                example-ok:
+                one-example:
                   value:
                     name: Michael Simmons
                     emailAddress: simmons@diggit.no
                     activeServices:
                       - Coyote TV
                       - Paramount
-                example-2:
+                another-example:
                   value:
                     name: James Franco
                     emailAddress: franco@diggit.no
@@ -79,12 +79,7 @@ components:
   schemas:
     Customer:
       type: object
-      examples:
-        - name: Michael Simmons
-          emailAddress: simmons@diggit.no
-          activeServices:
-            - Coyote TV
-            - Paramount
+      examples: []
       properties:
         name:
           type: string
