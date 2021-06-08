@@ -71,7 +71,8 @@ paths:
         description: ''
     parameters:
       - schema:
-          type: string
+          type: integer
+          minimum: 1
         name: customerId
         in: path
         required: true
