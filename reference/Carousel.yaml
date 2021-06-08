@@ -76,6 +76,185 @@ paths:
                 value:
                   - Documentary
                   - Drama
+    get:
+      summary: Get pre-defined recommendations
+      operationId: get-recommendations
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+              examples:
+                example-get:
+                  value:
+                    - id: 8136154
+                      details:
+                        director:
+                          - Jesper W. Nielsen
+                        cast:
+                          - Adam Lundgren
+                          - Evin Ahmad
+                          - Johan Rheborg
+                          - Malin Crépin
+                          - Joel Spira
+                          - Linus Wahlgren
+                          - Per Ragnar
+                          - Hannes Fohlin
+                          - Annika Hallin
+                          - Tina Pour Davoy
+                          - Ieva Andrejevaité
+                        year: 2021
+                        length: 44
+                        channelId: viaplayoriginals
+                      publishDate: '2021-06-06T00:00:00+0200'
+                      contentType: series
+                      title: Max Anger - With One Eye Open S01/E01
+                      description:
+                        short: Max Anger - With One Eye Open S01/E01
+                        long: 'Max og Pashie må holde forholdet hemmelig for selskapet Vektor, fordi Max håndterer konfidensiell informasjon, og Pashie er en utenlandsk konsulent. Når det oppstår problemer for Vektor, endres alt.'
+                      provider: 134
+                      images:
+                        background:
+                          url: 'https://cd-static2.telenorcdn.net/zuul/dis-api//-bCAAughnfLJtdQL6BFIUTlqzZU=/813x458/cdn-cd-production.cloud.xstream.dk/thumbnails/2021/06/07/1623057974077342200_video_logo.jpg'
+                      tags:
+                        - sd
+                      genres:
+                        - Drama
+                        - Thriller
+                    - id: 8116638
+                      details:
+                        director:
+                          - Anders Hazelius
+                        cast:
+                          - Amy Deasismont
+                          - Alexander Abdallah
+                          - Julia Lyskova
+                          - Max Ulveson
+                          - Gustaf Hammarsten
+                          - Helen Sjöholm
+                        year: 2020
+                        length: 29
+                        channelId: viaplayoriginals
+                      publishDate: '2021-05-23T00:01:00+0200'
+                      contentType: series
+                      title: Thunder in My Heart S01/E01
+                      description:
+                        short: Thunder in My Heart S01/E01
+                        long: Sigge har kjærlighetsproblemer og forsøker å søke trøst hos Antonia. Samtidig sender faren til Sigge oppmuntrende meldinger til Sigge og lillebroren hennes som venter på at han skal gå på kino med ham.
+                      images:
+                        background:
+                          url: 'https://cd-static2.telenorcdn.net/zuul/dis-api//XWnMIke588y5xfYLkW1KVC69G_M=/813x458/cdn-cd-production.cloud.xstream.dk/thumbnails/2021/05/21/1621583867025427700_video_logo.jpg'
+                      tags:
+                        - sd
+                      genres:
+                        - Comedy
+                        - Drama
+                    - id: 8134367
+                      details:
+                        director:
+                          - J.T. Rogers
+                        cast:
+                          - Ruth Wilson
+                          - Andrew Scott
+                          - Jeff Wilbusch
+                        year: 2021
+                        length: 113
+                        channelId: hbo
+                      publishDate: '2021-05-30T02:00:00+0200'
+                      contentType: video
+                      title: Oslo
+                      description:
+                        short: «Oslo» er basert på en sann historie og skildrer de hemmelige samtalene
+                        long: '«Oslo» er basert på en sann historie og skildrer de hemmelige samtalene, de usannsynlige vennskapene og det stillferdige heltemotet til en liten, men engasjert gruppe israelere og palestinere, pluss et norsk ektepar, som førte til Oslo-avtalen i 1993.'
+                      images:
+                        background:
+                          url: 'https://cd-static2.telenorcdn.net/zuul/dis-api//Htak8ukY8wZPlTHpAPFHMXAzCL8=/813x458/cdn-cd-production.cloud.xstream.dk/thumbnails/2021/06/01/1622532505001390800_video_logo.jpg'
+                      tags:
+                        - hd
+                      genres:
+                        - Drama
+                    - id: 8127453
+                      details:
+                        director:
+                          - Ben Winston
+                        cast:
+                          - Lisa Kudrow
+                          - Jennifer Aniston
+                          - David Schwimmer
+                          - Matthew Perry
+                          - Matt LeBlanc
+                          - Courteney Cox
+                        year: 2021
+                        length: 103
+                        channelId: hbo
+                      publishDate: '2021-05-27T09:01:00+0200'
+                      contentType: video
+                      title: 'Friends: The Reunion'
+                      description:
+                        short: Favorittvennene våre er tilbake på settet der alt startet!
+                        long: 'Favorittvennene våre er tilbake på settet der alt startet. Jennifer Aniston, Courteney Cox, Lisa Kudrow, Matt LeBlanc, Matthew Perry, David Schwimmer og spesielt inviterte gjester gjenforenes til en improvisert hyllest til det elskede showet.'
+                      images:
+                        background:
+                          url: 'https://cd-static2.telenorcdn.net/zuul/dis-api//Zdo_riTddApWizOI0XswpE5bDow=/813x458/cdn-cd-production.cloud.xstream.dk/thumbnails/2021/05/27/1622112832026094700_video_logo.jpg'
+                      tags:
+                        - hd
+                      genres:
+                        - Documentary
+                    - id: 8112928
+                      details:
+                        director:
+                          - Niki Caro
+                        cast:
+                          - Yufei Liu
+                          - Jet Li
+                          - Donnie Yen
+                        year: 2020
+                        length: 115
+                        channelId: disney
+                      publishDate: '1970-01-01T01:00:00+0100'
+                      contentType: video
+                      title: Mulan
+                      description:
+                        short: 'ACTION. USA/Canada/Hongkong. 2020. Med Yufei Liu og Donnie Yen. Fra 11 år. Lengde: 1.55.'
+                        long: 'Når den kinesiske keiseren sender ut en ordre om at en mann fra hver familie må tjenestegjøre i den keiserlige hæren for å bekjempe et angrep som truer Kina, tar Hua Mulan, den eldste datteren til en stor kriger, sin aldrende fars sted. Utkledd som mann under navnet Hua Jun blir prøvd til det ytterste. Det er en episk reise som kommer til å forvandle Mulan til en av de største kinesiske krigerne noensinne, og gi henne en hel nasjons respekt...og en fars stolthet.'
+                      images:
+                        background:
+                          url: 'https://cd-static2.telenorcdn.net/zuul/dis-api//Nqx7WdImuTlFJiJMRgLhHpdHAtc=/813x458/cdn-cd-production.cloud.xstream.dk/thumbnails/2021/06/04/1622801618062747300_video_logo.jpg'
+                      tags:
+                        - hd
+                      genres:
+                        - Action
+                        - Adventure
+                        - Drama
+                    - id: 7937084
+                      details:
+                        director:
+                          - Jet Li
+                        cast:
+                          - Rosalind Chaol
+                        year: 2016
+                        length: 57
+                        channelId: paramount_serie
+                      publishDate: '2021-03-25T01:00:00+0100'
+                      contentType: series
+                      title: Billions S01/E01
+                      description:
+                        short: Billions S01/E01
+                        long: Statsadvokat Chuck Rhoades får tips om innsidehandel som involverer milliardær og fondkonge Bobby Axelrod. Seriepremiere.
+                      images:
+                        background:
+                          url: 'https://cd-static2.telenorcdn.net/zuul/dis-api//4UO_OdpioAmIH9BOvEwdWviVbOE=/813x458/cdn-cd-production.cloud.xstream.dk/thumbnails/2021/05/27/1622117701027657500_video_logo.jpg'
+                      tags:
+                        - hd
+                      genres:
+                        - Drama
+          headers: {}
+      x-internal: true
+      description: Get pre-defined array of movies for front-end challenge
 components:
   schemas:
     Movie:
@@ -114,13 +293,13 @@ components:
           description: Unique identifier for the given movie.
         details:
           type: object
+          description: Details on given movie
           required:
             - director
             - cast
             - year
             - length
             - channelId
-          description: Details on given movie
           properties:
             director:
               type: array
@@ -146,10 +325,10 @@ components:
           type: string
         description:
           description: ''
+          type: object
           required:
             - short
             - long
-          type: object
           properties:
             short:
               type: string
@@ -189,6 +368,7 @@ components:
               - Horror
               - Action
               - Fantasy
+              - Adventure
       required:
         - id
         - details
@@ -197,4 +377,5 @@ components:
         - title
         - description
         - images
+        - tags
         - genres
